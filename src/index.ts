@@ -117,6 +117,7 @@ const makePullRequest = () => {
     exec('git checkout -b aws-cdk-version-update');
     exec('git add -A');
     exec('git commit -m "updated aws-cdk version to the latest"')
+    exec('git push origin aws-cdk-version-update');
 }
 
 const run = () => {
