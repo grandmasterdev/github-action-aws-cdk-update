@@ -1,4 +1,5 @@
 import { setOutput } from "@actions/core";
+import { exec } from '@actions/exec';
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
@@ -52,7 +53,6 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
 
       if (dependencies) {
         for (const dependency of Object.keys(dependencies)) {
-          console.info(dependency);
           if (dependency.indexOf(AWS_CDK_PACKAGE) > -1) {
             console.info("compare the version...");
             const currentVersion: string = dependencies[dependency]
@@ -72,7 +72,6 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
 
       if (devDependencies) {
         for (const dependency of Object.keys(devDependencies)) {
-          console.info(dependency);
           if (dependency.indexOf(AWS_CDK_PACKAGE) > -1) {
             console.info("compare the version...");
             const currentVersion: string = dependencies[dependency]
@@ -105,12 +104,20 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
         );
       }
 
+      makePullRequest();
+
       setOutput('is_updated', isUpdated);
     }
   } catch (ex) {
     throw ex;
   }
 };
+
+const makePullRequest = () => {
+    exec('git checkout -b aws-cdk-version-update');
+    exec('git add -A');
+    exec('git commit -m "updated aws-cdk version to the latest"')
+}
 
 const run = () => {
   const latestVersion = getLatestAwsCdkVersion();

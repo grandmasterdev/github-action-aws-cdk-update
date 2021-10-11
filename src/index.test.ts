@@ -1,15 +1,19 @@
 import { mocked } from "ts-jest/utils";
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
+import { exec } from '@actions/exec';
 import packageJson from "./__mocks__/package.json";
 
 jest.mock("child_process");
 jest.mock("fs");
+jest.mock("@actions/exec");
 
 describe("action test", () => {
   const mockedExecSync = mocked(execSync, true);
   const mockedReadFileSync = mocked(readFileSync, true);
   const mockedWriteFileSync = mocked(writeFileSync, true);
+  const mockedExec = mocked(exec, true);
+
   const mockedConsole = mocked(console, true);
 
   beforeEach(() => {
@@ -61,5 +65,6 @@ describe("action test", () => {
       ),
       { encoding: "utf-8" }
     );
+    expect(mockedExec).toHaveBeenCalledTimes(3);
   });
 });
