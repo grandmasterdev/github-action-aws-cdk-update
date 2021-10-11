@@ -10,4 +10,5 @@ runs:
   main: dist/index.js
 
 branding:
-  color: '#0984e3'
+  color: 'blue'
+  icon: 'archive'
