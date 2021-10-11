@@ -1,0 +1,13 @@
+name: 'aws-cdk-update'
+description: 'updates the version of aws cdk modules to the latest'
+
+outputs:
+  is_updated:
+    description: 'informs if the update was done successfully or not'
+
+runs:
+  using: node14
+  main: dist/index.js
+
+branding:
+  color: '#0984e3'
