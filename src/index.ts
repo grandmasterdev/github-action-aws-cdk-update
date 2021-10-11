@@ -21,7 +21,7 @@ const getLatestAwsCdkVersion = () => {
 };
 
 const getPackageJsonFile = () => {
-  const packageJson = readFileSync(resolve(__dirname, "..", "package.json"), {
+  const packageJson = readFileSync(resolve(__dirname, "..","..","..", "package.json"), {
     encoding: "utf-8",
   });
 
@@ -96,7 +96,7 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
         console.log("final output", packageJson);
 
         writeFileSync(
-          resolve(__dirname, "..", "package.json"),
+          resolve(__dirname, "..", "..","..","package.json"),
           JSON.stringify(packageJson, null, 2),
           {
             encoding: "utf-8",
