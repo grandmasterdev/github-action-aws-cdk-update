@@ -128,6 +128,8 @@ const githubConfig = async () => {
 const makePullRequest = async () => {
   const octokit = getOctokit(GITHUB_TOKEN);
 
+  const { data } = (await octokit.request("GET /repos/:owner/:repo", { owner: context.repo.owner, repo: context.repo.repo }));
+
   await githubConfig();
 
   console.info(`making pull request on changes...`);
@@ -140,13 +142,13 @@ const makePullRequest = async () => {
   await exec('git commit -m "updated aws-cdk version to the latest"');
   await exec(`git push ${GITHUB_REMOTE} aws-cdk-version-update`);
 
-  const pr = await octokit.rest.pulls.create({
+  await octokit.rest.pulls.create({
     owner: context.repo.owner,
     repo: context.repo.repo,
     title: "update aws-cdk version",
     body: "updated aws-cdk version to the latest",
-    base: 'aws-cdk-version-update',
-    head: "master",
+    base: data.default_branch,
+    head: "aws-cdk-version-update",
   });
 };
 
