@@ -1,6 +1,11 @@
 name: 'aws-cdk-update'
 description: 'updates the version of aws cdk modules to the latest'
 
+inputs:
+  working_dir:
+    description: 'the project working directory'
+    required: true
+
 outputs:
   is_updated:
     description: 'informs if the update was done successfully or not'

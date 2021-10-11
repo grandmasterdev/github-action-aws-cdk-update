@@ -1,5 +1,5 @@
-import { setOutput } from "@actions/core";
-import { exec } from '@actions/exec';
+import { setOutput, getInput } from "@actions/core";
+import { exec } from "@actions/exec";
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
@@ -21,7 +21,9 @@ const getLatestAwsCdkVersion = () => {
 };
 
 const getPackageJsonFile = () => {
-  const packageJson = readFileSync(resolve(__dirname, "..","..","..", "package.json"), {
+  const workingDir: string = getInput("working_dir") ?? '/';
+
+  const packageJson = readFileSync(resolve(workingDir, "package.json"), {
     encoding: "utf-8",
   });
 
@@ -95,8 +97,10 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
       if (isUpdated) {
         console.log("final output", packageJson);
 
+        const workingDir: string = getInput("working_dir") ?? '/';
+
         writeFileSync(
-          resolve(__dirname, "..", "..","..","package.json"),
+          resolve(workingDir, "package.json"),
           JSON.stringify(packageJson, null, 2),
           {
             encoding: "utf-8",
@@ -106,7 +110,7 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
         makePullRequest();
       }
 
-      setOutput('is_updated', isUpdated);
+      setOutput("is_updated", isUpdated);
     }
   } catch (ex) {
     throw ex;
@@ -114,11 +118,11 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
 };
 
 const makePullRequest = () => {
-    exec('git checkout -b aws-cdk-version-update');
-    exec('git add -A');
-    exec('git commit -m "updated aws-cdk version to the latest"')
-    exec('git push origin aws-cdk-version-update');
-}
+  exec("git checkout -b aws-cdk-version-update");
+  exec("git add -A");
+  exec('git commit -m "updated aws-cdk version to the latest"');
+  exec("git push origin aws-cdk-version-update");
+};
 
 const run = () => {
   const latestVersion = getLatestAwsCdkVersion();
