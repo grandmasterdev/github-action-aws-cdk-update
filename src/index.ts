@@ -102,9 +102,9 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
             encoding: "utf-8",
           }
         );
-      }
 
-      makePullRequest();
+        makePullRequest();
+      }
 
       setOutput('is_updated', isUpdated);
     }
