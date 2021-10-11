@@ -65,6 +65,6 @@ describe("action test", () => {
       ),
       { encoding: "utf-8" }
     );
-    expect(mockedExec).toHaveBeenCalledTimes(3);
+    expect(mockedExec).toHaveBeenCalledTimes(4);
   });
 });
