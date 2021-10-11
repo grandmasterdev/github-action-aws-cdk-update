@@ -6,6 +6,12 @@ import { resolve } from "path";
 
 const AWS_CDK_PACKAGE: string = "@aws-cdk";
 
+const WORKING_DIR: string = getInput("working-dir");
+const GITHUB_USER: string = getInput("github-user");
+const GITHUB_EMAIL: string = getInput("github-email");
+const GITHUB_TOKEN: string = getInput("github-token");
+const GITHUB_REMOTE: string = getInput("github-remote");
+
 const getLatestAwsCdkVersion = () => {
   const output = execSync("npm view @aws-cdk/core version", {
     encoding: "utf-8",
@@ -21,13 +27,16 @@ const getLatestAwsCdkVersion = () => {
 };
 
 const getPackageJsonFile = () => {
-  const workingDir: string = getInput("working_dir") ?? '/';
-
-  const packageJson = readFileSync(resolve(workingDir, "package.json"), {
+  const packageJson = readFileSync(resolve(WORKING_DIR, "package.json"), {
     encoding: "utf-8",
   });
 
   return packageJson ? JSON.parse(packageJson ?? undefined) : {};
+};
+
+const githubConfig = async () => {
+  await exec(`git config --global user.name ${GITHUB_USER}`);
+  await exec(`git config --global user.email ${GITHUB_EMAIL}`);
 };
 
 const replaceVersionIfNotTheSame = (
@@ -42,7 +51,7 @@ const replaceVersionIfNotTheSame = (
   return object;
 };
 
-const updateAllAwsCdkModules = (latestVersion: string) => {
+const updateAllAwsCdkModules = async (latestVersion: string) => {
   try {
     console.info("updating all aws cdk modules...");
     const originalPackageJson = getPackageJsonFile();
@@ -68,8 +77,6 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
             );
           }
         }
-
-        console.log(dependencies);
       }
 
       if (devDependencies) {
@@ -95,19 +102,17 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
       }
 
       if (isUpdated) {
-        console.log("final output", packageJson);
-
-        const workingDir: string = getInput("working_dir") ?? '/';
+        console.info("final output", packageJson);
 
         writeFileSync(
-          resolve(workingDir, "package.json"),
+          resolve(WORKING_DIR, "package.json"),
           JSON.stringify(packageJson, null, 2),
           {
             encoding: "utf-8",
           }
         );
 
-        makePullRequest();
+        await makePullRequest();
       }
 
       setOutput("is_updated", isUpdated);
@@ -117,17 +122,20 @@ const updateAllAwsCdkModules = (latestVersion: string) => {
   }
 };
 
-const makePullRequest = () => {
-  exec("git checkout -b aws-cdk-version-update");
-  exec("git add -A");
-  exec('git commit -m "updated aws-cdk version to the latest"');
-  exec("git push origin aws-cdk-version-update");
+const makePullRequest = async () => {
+  await exec("git checkout -b aws-cdk-version-update");
+  await exec("git add -A");
+  await exec('git commit -m "updated aws-cdk version to the latest"');
+  await exec("git push origin aws-cdk-version-update");
 };
 
-const run = () => {
+const run = async () => {
+  console.info("current working dir", WORKING_DIR);
+
   const latestVersion = getLatestAwsCdkVersion();
 
-  updateAllAwsCdkModules(latestVersion);
+  await githubConfig();
+  await updateAllAwsCdkModules(latestVersion);
 };
 
 run();
