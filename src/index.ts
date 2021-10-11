@@ -1,5 +1,6 @@
 import { setOutput, getInput } from "@actions/core";
 import { exec } from "@actions/exec";
+import { getOctokit, context } from "@actions/github";
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
@@ -125,15 +126,28 @@ const githubConfig = async () => {
 };
 
 const makePullRequest = async () => {
+  const octokit = getOctokit(GITHUB_TOKEN);
+
   await githubConfig();
 
   console.info(`making pull request on changes...`);
 
-  await exec("git checkout -b aws-cdk-version-update", undefined, {cwd: WORKING_DIR});
+  await exec("git checkout -b aws-cdk-version-update", undefined, {
+    cwd: WORKING_DIR,
+  });
   await exec("git status");
   await exec("git add -A");
   await exec('git commit -m "updated aws-cdk version to the latest"');
   await exec(`git push ${GITHUB_REMOTE} aws-cdk-version-update`);
+
+  const pr = await octokit.rest.pulls.create({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    title: "update aws-cdk version",
+    body: "updated aws-cdk version to the latest",
+    base: 'aws-cdk-version-update',
+    head: "master",
+  });
 };
 
 const run = async () => {
