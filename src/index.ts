@@ -5,7 +5,7 @@ import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
-const AWS_CDK_PACKAGE: string = "@aws-cdk";
+const AWS_CDK_PACKAGE: string = "aws-cdk/";
 
 const WORKING_DIR: string = getInput("working-dir") ?? ".";
 const GITHUB_USER: string = getInput("github-user") ?? "";
@@ -13,6 +13,10 @@ const GITHUB_EMAIL: string = getInput("github-email") ?? "";
 const GITHUB_TOKEN: string = getInput("github-token") ?? "";
 const GITHUB_REMOTE: string = getInput("github-remote") ?? "origin";
 
+/**
+ * Get the latest AWS CDK version from npm
+ * @returns awws cdk version
+ */
 const getLatestAwsCdkVersion = async () => {
   const output = execSync("npm view @aws-cdk/core version", {
     encoding: "utf-8",
@@ -27,6 +31,10 @@ const getLatestAwsCdkVersion = async () => {
   return output.replace("\n", "").replace("\r\n", "");
 };
 
+/**
+ * Get package json file data
+ * @returns package.json object
+ */
 const getPackageJsonFile = async () => {
   const packageJson = readFileSync(resolve(WORKING_DIR, "package.json"), {
     encoding: "utf-8",
@@ -35,6 +43,13 @@ const getPackageJsonFile = async () => {
   return packageJson ? JSON.parse(packageJson ?? undefined) : {};
 };
 
+/**
+ * Check and replace the version if its not updated
+ * @param current 
+ * @param latest 
+ * @param object 
+ * @returns updated mutated object
+ */
 const replaceVersionIfNotTheSame = (
   current: string,
   latest: string,
@@ -47,6 +62,10 @@ const replaceVersionIfNotTheSame = (
   return object;
 };
 
+/**
+ * Update the aws cdk module to the latest
+ * @param latestVersion 
+ */
 const updateAllAwsCdkModules = async (latestVersion: string) => {
   try {
     console.info("updating all aws cdk modules...");
@@ -118,6 +137,9 @@ const updateAllAwsCdkModules = async (latestVersion: string) => {
   }
 };
 
+/**
+ * Assert the git config
+ */
 const githubConfig = async () => {
   console.info(`configuring git settings...`);
 
@@ -125,6 +147,9 @@ const githubConfig = async () => {
   await exec(`git config --global user.email ${GITHUB_EMAIL}`);
 };
 
+/**
+ * Make pull request if there's changes
+ */
 const makePullRequest = async () => {
   const octokit = getOctokit(GITHUB_TOKEN);
 
@@ -152,6 +177,9 @@ const makePullRequest = async () => {
   });
 };
 
+/**
+ * Executor
+ */
 const run = async () => {
   console.info("current working dir", WORKING_DIR);
 
