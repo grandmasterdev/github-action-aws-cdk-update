@@ -13,8 +13,8 @@ inputs:
     description: 'email of the github user'
     require: true
   github-remote:
-    description: 'remote repo origin'
-    require: true
+    description: 'the git remote name'
+    require: false
     default: 'origin'
   github-token:
     description: 'github token for action operation'
