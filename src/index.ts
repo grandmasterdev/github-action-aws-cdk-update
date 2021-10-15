@@ -165,7 +165,7 @@ const makePullRequest = async () => {
   await exec("git status");
   await exec("git add -A");
   await exec('git commit -m "updated aws-cdk version to the latest"');
-  await exec(`git push ${GITHUB_REMOTE} aws-cdk-version-update`);
+  await exec(`git push --force ${GITHUB_REMOTE} aws-cdk-version-update`);
 
   await octokit.rest.pulls.create({
     owner: context.repo.owner,

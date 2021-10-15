@@ -2,18 +2,24 @@
 
 Action to update aws cdk to the latest version automatically and creates a pull request.
 
+## Dependency
+
+* [Github Action - Checkout](https://github.com/marketplace/actions/checkout)
+
 ## How to use it
 
 Create a step in your job that will use the action as follows:
 
 ```yaml
-uses: grandmasterdev/github-action-aws-cdk-update
-      with:
-        working-dir: ${{env.wd}}
-        github-user: 'action-committer'
-        github-email: 'action-committer'
-        github-token: ${{github.token}}
-        github-remote: 'origin'
+-  uses: actions/checkout
+
+-  uses: grandmasterdev/github-action-aws-cdk-update
+        with:
+          working-dir: ${{github.workspace}}
+          github-user: 'action-committer'
+          github-email: 'action-committer'
+          github-token: ${{github.token}}
+          github-remote: 'origin'
 
 ```
 
@@ -31,6 +37,12 @@ name: Get working directory list
 
 ```
 
+Alternatively, you could use github action `context` to get the working directory via 
+
+```
+${{github.workspace}}
+```
+
 With the above, you can then access the value of the working directory via the environment variable like the following:
 
 ```yaml
@@ -45,22 +57,16 @@ With the above, you can then access the value of the working directory via the e
         working-dir: ${{env.wd}}
 ```
 
+or if you are using `context`
+
+```yaml
+- uses: grandmasterdev/github-action-aws-cdk-update
+      with:
+        working-dir: ${{github.workspace}}
+```
+
 ## Inputs
 
-github-user:
-description: 'user of github'
-required: true
-default: 'github-action-committer'
-github-email:
-description: 'email of the github user'
-require: true
-github-remote:
-description: 'remote repo origin'
-require: true
-default: 'origin'
-github-token:
-description: 'github token for action operation'
-require: true
 
 | Name          | Description                                                               | Required?          |
 | ------------- | ------------------------------------------------------------------------- | ------------------ |
