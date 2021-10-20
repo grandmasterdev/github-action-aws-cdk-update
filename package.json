@@ -1,6 +1,6 @@
 {
   "name": "aws-cdk-update",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Action to update aws cdk to the latest version automatically",
   "main": "dist/index.js",
   "scripts": {
