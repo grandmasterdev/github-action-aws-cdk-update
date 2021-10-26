@@ -151,7 +151,7 @@ const githubConfig = async () => {
  */
 const makePullRequest = async () => {
   const octokit = getOctokit(GITHUB_TOKEN);
-
+console.log(context);
   const { data } = (await octokit.request("GET /repos/:owner/:repo", { owner: context.repo.owner, repo: context.repo.repo }));
 
   await githubConfig();
