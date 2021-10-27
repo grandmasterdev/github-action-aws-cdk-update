@@ -1,7 +1,6 @@
 import { setOutput, getInput } from "@actions/core";
-import { exec } from "@actions/exec";
+import { exec, getExecOutput } from "@actions/exec";
 import { getOctokit, context } from "@actions/github";
-import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
@@ -18,8 +17,8 @@ const GITHUB_REMOTE: string = getInput("github-remote") ?? "origin";
  * @returns awws cdk version
  */
 const getLatestAwsCdkVersion = async () => {
-  const output = execSync("npm view @aws-cdk/core version", {
-    encoding: "utf-8",
+  const output = await getExecOutput("npm", ["view", "@aws-cdk/core", "version"], {
+    ignoreReturnCode: true
   });
 
   if (!output) {
@@ -28,7 +27,7 @@ const getLatestAwsCdkVersion = async () => {
     );
   }
 
-  return output.replace("\n", "").replace("\r\n", "");
+  return output.stdout.replace("\n", "").replace("\r\n", "");
 };
 
 /**
@@ -152,7 +151,7 @@ const githubConfig = async () => {
  */
 const makePullRequest = async () => {
   const octokit = getOctokit(GITHUB_TOKEN);
-
+console.log(context);
   const { data } = (await octokit.request("GET /repos/:owner/:repo", { owner: context.repo.owner, repo: context.repo.repo }));
 
   await githubConfig();
@@ -186,6 +185,8 @@ const run = async () => {
   const latestVersion = await getLatestAwsCdkVersion();
 
   await updateAllAwsCdkModules(latestVersion);
+
+  setOutput('cdk_version', latestVersion);
 };
 
 run();

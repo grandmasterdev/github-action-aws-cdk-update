@@ -23,6 +23,8 @@ inputs:
 outputs:
   is_updated:
     description: 'informs if the update was done successfully or not'
+  cdk_version:
+    description: 'the version that the project/repo is currently using'
 
 runs:
   using: node12
